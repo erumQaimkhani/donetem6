@@ -6,7 +6,7 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Swal from "sweetalert2";
-
+import Convertecurrency from "./convertcurrency";
 
 interface Product {
   _id: string;
@@ -28,18 +28,9 @@ interface Product {
   };
 }
 
-
-interface SanityImageSource {
-  asset?: {
-    _ref?: string;
-    _type: "reference";
-  };
-}
-
-
 const builder = imageUrlBuilder(client);
-function urlFor(source?: SanityImageSource) {
-  return source?.asset?._ref ? builder.image(source).url() : "";
+function urlFor(source?: { _ref?: string }) {
+  return source?._ref ? builder.image(source).url() : "";
 }
 
 const Filter = () => {
@@ -70,7 +61,6 @@ const Filter = () => {
         setLoading(false);
       }
     }
-
     fetchProducts();
   }, []);
 
@@ -86,6 +76,7 @@ const Filter = () => {
 
   const handleAddToCart = (e: React.MouseEvent, product: Product) => {
     e.preventDefault();
+    e.stopPropagation();
 
     Swal.fire({
       title: `<strong>Checkout ${product.title}</strong>`,
@@ -93,22 +84,13 @@ const Filter = () => {
         <div class="text-left">
           <p class="text-gray-700 mb-4">Price: <span class="font-bold">$${product.price}</span></p>
           <label class="block text-gray-700 mb-2">Billing Address</label>
-          <input
-            type="text"
-            id="billingAddress"
-            class="w-full px-4 py-2 border rounded-lg mb-4"
-            placeholder="Enter your billing address"
-          />
+          <input type="text" id="billingAddress" class="w-full px-4 py-2 border rounded-lg mb-4" placeholder="Enter your billing address" />
           <label class="block text-gray-700 mb-2">Payment Method</label>
-          <select
-            id="paymentMethod"
-            class="w-full px-4 py-2 border rounded-lg mb-4"
-          >
+          <select id="paymentMethod" class="w-full px-4 py-2 border rounded-lg mb-4">
             <option value="creditCard">Credit Card</option>
             <option value="paypal">PayPal</option>
             <option value="cashOnDelivery">Cash on Delivery</option>
-               <option value="stripepay">Stripe</option>
-
+            <option value="stripepay">Stripe</option>
           </select>
         </div>
       `,
@@ -124,6 +106,15 @@ const Filter = () => {
       if (result.isConfirmed) {
         const billingAddress = (document.getElementById("billingAddress") as HTMLInputElement).value;
         const paymentMethod = (document.getElementById("paymentMethod") as HTMLSelectElement).value;
+
+        if (!billingAddress) {
+          Swal.fire({
+            icon: "error",
+            title: "Billing Address Required",
+            text: "Please enter a valid billing address.",
+          });
+          return;
+        }
 
         processOrder(billingAddress, paymentMethod, product);
       }
@@ -162,19 +153,8 @@ const Filter = () => {
       </h1>
 
       <div className="flex justify-between items-center mb-6">
-        <input
-          type="text"
-          placeholder="Search for products"
-          className="px-4 py-2 border rounded-lg"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-
-        <select
-          className="px-4 py-2 border rounded-lg"
-          value={priceFilter}
-          onChange={(e) => setPriceFilter(e.target.value)}
-        >
+        <input type="text" placeholder="Search for products" className="px-4 py-2 border rounded-lg" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        <select className="px-4 py-2 border rounded-lg" value={priceFilter} onChange={(e) => setPriceFilter(e.target.value)}>
           <option value="all">All</option>
           <option value="lowToHigh">Price: Low to High</option>
           <option value="highToLow">Price: High to Low</option>
@@ -184,11 +164,11 @@ const Filter = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredProducts.map((product) => (
           <div key={product._id} className="bg-white rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 overflow-hidden transform hover:scale-105">
-            <Link href={product.slug?.current ? `/product/${product.slug.current}` : "#"}>
+            <Link href={product.slug?.current ? `/product/${product.slug.current}` : "#"} passHref>
               <div>
                 <div className="relative">
                   {product.productImage?.asset?._ref ? (
-                    <Image src={urlFor(product.productImage)} alt={product.title} width={500} height={300} className="w-full h-64 object-cover" />
+                    <Image src={urlFor(product.productImage?.asset)} alt={product.title} width={500} height={300} className="w-full h-64 object-cover" />
                   ) : (
                     <div className="w-full h-64 flex items-center justify-center bg-gray-200">
                       <p className="text-gray-500">No Image Available</p>
@@ -202,6 +182,7 @@ const Filter = () => {
                     Add to Cart
                   </button>
                 </div>
+                <Convertecurrency />
               </div>
             </Link>
           </div>

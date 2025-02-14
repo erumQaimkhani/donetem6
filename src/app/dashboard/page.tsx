@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Swal from "sweetalert2";
 
-
+import Pagination from "../components/pagination";
 interface Product {
   _id: string;
   title: string;
@@ -205,6 +205,7 @@ const Filter = () => {
           </div>
         ))}
       </div>
+      <Pagination />
     </div>
   );
 };

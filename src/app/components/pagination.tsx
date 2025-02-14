@@ -6,13 +6,16 @@ import Image from "next/image";
 const Pagination: React.FC = () => {
   const products = [
     { src: "/images/Maskwhite.png", alt: "Image 1", name: "Trenton modular sofa_3", price: 25000 },
-    { src: "/images/whitechairs.jpg", alt: "Image 2", name: "Granite dining table with dining chair", price: 25000 },
+    { src: "/images/white chair.png", alt: "Image 2", name: "Granite dining table with dining chair", price: 25000 },
     { src: "/images/mask1.png", alt: "Image 3", name: "Outdoor bar table and stool", price: 30000 },
     { src: "/images/plain console with teak mirror 1.png", alt: "Image 4", name: "Plain console with teak mirror", price: 28000 },
     { src: "/images/Grain coffee table 1.png", alt: "Image 5", name: "Grain coffee table", price: 20000 },
-    { src: "/images/Mask 2.png", alt: "Image 6", name: "Decorative piece", price: 15000 },
+    { src: "/images/Mask group.jpg", alt: "Image 6", name: "Decorative piece", price: 15000 },
     { src: "/images/Plain console_ 1.png", alt: "Image 7", name: "Plain console", price: 22000 },
     { src: "/images/Mask3.png", alt: "Image 8", name: "Modern shelf", price: 35000 },
+     { src: "/images/Mask6.png", alt: "Image 9", name: "white carsole", price: 35000 },
+     { src: "/images/Rectangle 14.jpg", alt: "Image 10", name: "Laptop", price: 60000 }, 
+     { src: "/images/asgaard.png", alt: "Image 11", name: "sofa", price: 40000 }, { src: "/images/Mask3.png", alt: "Image 8", name: "Modern shelf", price: 35000 },
   ];
 
   const [currentPage, setCurrentPage] = useState<number>(1);

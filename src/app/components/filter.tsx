@@ -10,10 +10,9 @@ import Swal from "sweetalert2";
 interface Product {
   _id: string;
   title: string;
-  productImage: {
-    asset: {
+  productImage?: {
+    asset?: {
       _ref: string;
-      _type: "reference";
     };
   };
   price: number;
@@ -22,16 +21,16 @@ interface Product {
   inventory?: number;
   tag?: string;
   isNew?: boolean;
-  slug: {
-    current: string;
+  slug?: {
+    current?: string;
   };
 }
 
 const builder = imageUrlBuilder(client);
 
-
-function urlFor(source: { asset: { _ref: string; _type: string } }) {
-  return source?.asset?._ref ? builder.image(source).url() : "";
+// ✅ Fixed `urlFor` function to ensure it handles missing images properly.
+function urlFor(source?: { _ref: string }) {
+  return source?._ref ? builder.image(source).url() : "";
 }
 
 const Filter = () => {
@@ -64,16 +63,16 @@ const Filter = () => {
     }
 
     fetchProducts();
-  }, []);
+  }, []); // ✅ Dependency array ensures the effect runs once.
 
+  // ✅ Improved filtering logic
   const filteredProducts = products.filter((product) => {
-    const matchesSearch =
-      product.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = product.title.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesPrice =
       priceFilter === "all" ||
       (priceFilter === "lowToHigh" && product.price <= 20000) ||
-      (priceFilter === "highToLow" && product.price > 20000);
+      (priceFilter === "middle" && product.price > 20000 && product.price <= 50000) || (priceFilter === "highToLow" && product.price > 20000);
 
     return matchesSearch && matchesPrice;
   });
@@ -108,6 +107,7 @@ const Filter = () => {
         Our Products
       </h1>
 
+      {/* ✅ Search and Filter Section */}
       <div className="flex justify-between items-center mb-6">
         <input
           type="text"
@@ -116,8 +116,6 @@ const Filter = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-
-
         <select
           className="px-4 py-2 border rounded-lg"
           value={priceFilter}
@@ -129,7 +127,7 @@ const Filter = () => {
         </select>
       </div>
 
-    
+      {/* ✅ Product List */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredProducts.map((product) => (
           <div
@@ -140,9 +138,9 @@ const Filter = () => {
               <Link href={`/product/${product.slug.current}`}>
                 <div>
                   <div className="relative">
-                    {product.productImage ? (
+                    {product.productImage?.asset ? (
                       <Image
-                        src={urlFor(product.productImage)}
+                        src={urlFor(product.productImage.asset)}
                         alt={product.title}
                         width={500}
                         height={300}
@@ -154,7 +152,7 @@ const Filter = () => {
                       </div>
                     )}
                     {product.isNew && (
-                      <button className="bg-gradient-to-r from-pink-300 via-purple-500 to-indigo-200 text-white py-2 px-4 rounded-full hover:bg-indigo-300 transition-transform duration-300 ease-in-out shadow-md">
+                      <button className="absolute top-2 left-2 bg-gradient-to-r from-pink-300 via-purple-500 to-indigo-200 text-white py-1 px-3 rounded-full text-xs font-semibold">
                         New Arrival
                       </button>
                     )}
@@ -184,7 +182,7 @@ const Filter = () => {
                 <p className="text-lg text-gray-600 mt-2">Price: ${product.price}</p>
                 <p className="text-red-500 mt-2">Slug not available</p>
                 <button
-                  className="bg-gradient-to-r from-pink-300 via-purple-500 to-indigo-200 text-white py-2 px-4 rounded-full hover:bg-indigo-300 transition-transform duration-300 ease-in-out shadow-md"
+                  className="bg-indigo-600 text-white py-2 px-4 rounded-full hover:bg-indigo-700 transition-transform duration-300"
                   onClick={(e) => handleAddToCart(e, product)}
                 >
                   Add to Cart

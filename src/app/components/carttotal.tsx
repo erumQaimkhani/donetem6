@@ -1,7 +1,7 @@
 
 import React from "react";
 import Image from "next/image";
-
+import Pagination from "./pagination";
 interface CartTotalProps {
   items: { image: string; name: string; price: number; quantity: number }[];
   subtotal: number;
@@ -21,17 +21,31 @@ export default function CartTotal({ items = [], subtotal = 0, total = 0, onCheck
             items.map((item, index) => (
               <div key={index} className="flex items-center justify-between p-4 border-b last:border-none">
                 <div className="flex items-center space-x-4">
-                  <Image src={item.image} alt={item.name} width={80} height={80} className="rounded-lg shadow-sm" />
+                  {/* Next.js Optimized Image */}
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    width={80}
+                    height={80}
+                    priority
+                    className="rounded-lg shadow-sm"
+                  />
                   <div>
                     <span className="text-lg font-medium text-gray-700">{item.name}</span>
-                    <p className="text-sm text-gray-500">Rs. {item.price}</p>
+                    <p className="text-sm text-gray-500">Rs. {item.price || 0}</p>
                   </div>
                 </div>
+
+                {/* Quantity */}
                 <div className="flex items-center space-x-4">
                   <span className="text-gray-700">Qty:</span>
-                  <span className="px-3 py-1 border rounded-md text-gray-700">{item.quantity}</span>
+                  <span className="px-3 py-1 border rounded-md text-gray-700">{item.quantity || 1}</span>
                 </div>
-                <span className="text-lg font-semibold text-gray-900">Rs. {item.price * item.quantity}</span>
+
+                {/* Total Price Per Item */}
+                <span className="text-lg font-semibold text-gray-900">
+                  Rs. {(item.price || 0) * (item.quantity || 1)}
+                </span>
               </div>
             ))
           ) : (
@@ -52,12 +66,13 @@ export default function CartTotal({ items = [], subtotal = 0, total = 0, onCheck
           </div>
           <button
             onClick={onCheckout}
-            className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-lg font-semibold py-3 rounded-lg hover:opacity-90 transition"
+            className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-lg font-semibold py-3 rounded-lg hover:opacity-90 transition-all hover:scale-105"
           >
             Proceed to Checkout
           </button>
         </div>
       </div>
+      <Pagination />
     </div>
   );
 }
